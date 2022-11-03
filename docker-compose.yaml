@@ -3,7 +3,6 @@ services:
   homeassistant:
     image: lscr.io/linuxserver/homeassistant:latest
     container_name: homeassistant
-    network_mode: host
     environment:
       - PUID=1000
       - PGID=1000
@@ -16,17 +15,26 @@ services:
     ports:
       - 8123:8123
     restart: unless-stopped
+    networks:
+      automation_vlan:
+        ipv4_address: 10.17.17.30
+      automation_bridge:
+        ipv4_address: 172.18.0.5
 
   mosquitto:
     image: eclipse-mosquitto:2
     volumes:
-      - "/home/docker/mosquitto/config/:/mosquitto/config/:ro"
+      - "/home/docker/mosquitto/config/:/mosquitto/config/"
       - "/home/docker/mosquitto/log/:/mosquitto/log/"
       - "/home/docker/mosquitto/data/:/mosquitto/data/"
     ports:
       - 1883:1883
       - 9001:9001
     restart: unless-stopped
+    networks:
+      automation_bridge:
+        ipv4_address: 172.18.0.2
+
 
   zigbee2mqtt:
     container_name: zigbee2mqtt
@@ -42,8 +50,12 @@ services:
     #devices:
       # Make sure this matched your adapter location
       #- /dev/serial/by-id/usb-Texas_Instruments_TI_CC2531_USB_CDC___0X00124B0018ED3DDF-if00:/dev/ttyACM0
+    networks:
+      automation_bridge:
+        ipv4_address: 172.18.0.3
 
   appdaemon:
+    container_name: "appdaemon"
     image: hazard/appdaemon-apps:latest
     links:
       - homeassistant
@@ -53,4 +65,29 @@ services:
       - TZ=America/LosAngeles
       - HA_URL=http://homeassistant:8123
       - HA_TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1ZjEzZTZkNDMwNmE0ZmUwODJmOTI4OTRmMzc5YTI2ZiIsImlhdCI6MTU0NTg5NTAwOCwiZXhwIjoxODYxMjU1MDA4fQ.RdSg11mDT1PNIlA72K-01DKPRCCFnuroj-C2AwehI4E
-    container_name: "appdaemon"
+    networks:
+      automation_bridge:
+        ipv4_address: 172.18.0.4
+
+
+
+
+networks:
+  automation_vlan:
+    driver: macvlan
+    driver_opts:
+      parent: ens18
+    ipam:
+      config:
+        -
+          subnet: 10.17.17.0/24
+          gateway: 10.17.17.3
+  automation_bridge:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        -
+          subnet: 172.18.0.0/16
+          gateway: 172.18.0.1
+
