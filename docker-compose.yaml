@@ -63,9 +63,9 @@ services:
       - "/home/docker/appdaemon/compose/apps:/apps"
       - "/home/docker/appdaemon/conf:/conf"
     environment:
-      - TZ=America/LosAngeles
+      - TZ=${TZ:-UTC}
       - HA_URL=http://172.18.0.5:8123
-      - HA_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI4NWZkOTNlYWQyYjg0Nzg5OGM5MGVhYzRhZmUxYWJkZCIsImlhdCI6MTY2NzU0Mzc2NSwiZXhwIjoxOTgyOTAzNzY1fQ.nkv9-a8Z5H6VY7CRpVKsFeH_zyl4ry0iuCNBPxf0zuo
+      - HA_TOKEN=${HA_TOKEN}
     networks:
         bridge:
           ipv4_address: 172.18.0.4
@@ -73,15 +73,29 @@ services:
   # pihole
   pihole:
     container_name: pihole
-    image: pihole/pihole:latest
-    # For DHCP it is recommended to remove these ports and instead add: network_mode: "host"
+    image: cbcrowe/pihole-unbound:latest
+    hostname: ${HOSTNAME}
+    domainname: ${DOMAIN_NAME}
     ports:
+      - "443:443/tcp"
       - "53:53/tcp"
       - "53:53/udp"
-      - "67:67/udp" # Only required if you are using Pi-hole as your DHCP server
       - "80:80/tcp"
+      # - 5335:5335/tcp # Uncomment to enable unbound access on local server
+      # - 22/tcp # Uncomment to enable SSH
+
     environment:
-      TZ: 'America/LosAngeles'
+      - FTLCONF_LOCAL_IPV4=${FTLCONF_LOCAL_IPV4}
+      - TZ=${TZ:-UTC}
+      - WEBPASSWORD=${PIHOLE_WEBPASSWORD}
+      - WEBTHEME=${WEBTHEME:-default-light}
+      - REV_SERVER=${REV_SERVER:-false}
+      - REV_SERVER_TARGET=${REV_SERVER_TARGET}
+      - REV_SERVER_DOMAIN=${REV_SERVER_DOMAIN}
+      - REV_SERVER_CIDR=${REV_SERVER_CIDR}
+      - PIHOLE_DNS_=127.0.0.1#5335
+      - DNSSEC="true"
+      - DNSMASQ_LISTENING=single
     # Volumes store your data between container upgrades
     volumes:
       - "/home/docker/etc-pihole:/etc/pihole"
