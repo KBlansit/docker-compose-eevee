@@ -35,6 +35,8 @@ services:
     networks:
       bridge:
         ipv4_address: 172.18.0.2
+      macvlan:
+        ipv4_address: 10.17.17.31
 
   zigbee2mqtt:
     container_name: zigbee2mqtt
@@ -47,12 +49,13 @@ services:
       - 8080:8080
     environment:
       - TZ=America/LosAngeles
-    #devices:
-      # Make sure this matched your adapter location
-      #- /dev/serial/by-id/usb-Texas_Instruments_TI_CC2531_USB_CDC___0X00124B0018ED3DDF-if00:/dev/ttyACM0
+    devices:
+      - /dev/ttyUSB0:/dev/ttyACM0
     networks:
       bridge:
         ipv4_address: 172.18.0.3
+      macvlan:
+        ipv4_address: 10.17.17.32
 
   appdaemon:
     container_name: appdaemon
