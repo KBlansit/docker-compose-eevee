@@ -7,7 +7,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=America/LosAngeles
+      - TZ=${TZ:-UTC}
     volumes:
       - "/fast/docker/home-assistant/media:/media"
       - "/home/docker/home-assistant/config:/config"
@@ -48,7 +48,7 @@ services:
     ports:
       - 8080:8080
     environment:
-      - TZ=America/LosAngeles
+      - TZ=${TZ:-UTC}
     devices:
       - /dev/ttyUSB0:/dev/ttyACM0
     networks:
@@ -90,8 +90,6 @@ services:
       - "53:53/tcp"
       - "53:53/udp"
       - "80:80/tcp"
-      # - 5335:5335/tcp # Uncomment to enable unbound access on local server
-      # - 22/tcp # Uncomment to enable SSH
 
     environment:
       - FTLCONF_LOCAL_IPV4=${FTLCONF_LOCAL_IPV4}
@@ -115,6 +113,18 @@ services:
       macvlan:
         ipv4_address: 10.17.17.11
   
+  duckdns:
+    image: lscr.io/linuxserver/duckdns:latest
+    container_name: duckdns
+    environment:
+      - TZ=${TZ:-UTC}
+      - SUBDOMAINS=${DNS_SUBDOMAINS}
+      - TOKEN=${DUCK_DNS_TOKEN}
+      - LOG_FILE=true
+    volumes:
+      - /home/docker/duckdns/config:/config
+    restart: unless-stopped
+
 
 networks:
   macvlan:
