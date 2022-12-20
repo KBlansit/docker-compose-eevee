@@ -1,4 +1,4 @@
-version: "2.1"
+version: '2.1'
 services:
   # home assistant services
   homeassistant:
@@ -9,10 +9,10 @@ services:
       - PGID=1000
       - TZ=${TZ:-UTC}
     volumes:
-      - "/fast/docker/home-assistant/media:/media"
-      - "/home/docker/home-assistant/config:/config"
-      - "/home/docker/home-assistant/db:/config/db"
-      - "/home/docker/home-assistant/logs:/config/logs"
+      - '/fast/docker/home-assistant/media:/media'
+      - '/home/docker/home-assistant/config:/config'
+      - '/home/docker/home-assistant/db:/config/db'
+      - '/home/docker/home-assistant/logs:/config/logs'
     ports:
       - 8123:8123
     restart: unless-stopped
@@ -25,9 +25,9 @@ services:
   mosquitto:
     image: eclipse-mosquitto:latest
     volumes:
-      - "/home/docker/mosquitto/config/:/mosquitto/config/"
-      - "/home/docker/mosquitto/log/:/mosquitto/log/"
-      - "/home/docker/mosquitto/data/:/mosquitto/data/"
+      - '/home/docker/mosquitto/config/:/mosquitto/config/'
+      - '/home/docker/mosquitto/log/:/mosquitto/log/'
+      - '/home/docker/mosquitto/data/:/mosquitto/data/'
     ports:
       - 1883:1883
       - 9001:9001
@@ -43,8 +43,8 @@ services:
     image: koenkk/zigbee2mqtt
     restart: unless-stopped
     volumes:
-      - "/home/docker/zigbee2mqtt/data:/app/data"
-      - "/run/udev:/run/udev:ro"
+      - '/home/docker/zigbee2mqtt/data:/app/data'
+      - '/run/udev:/run/udev:ro'
     ports:
       - 8080:8080
     environment:
@@ -66,11 +66,11 @@ services:
     links:
       - homeassistant
     volumes:
-      - "/home/docker/appdaemon/compose/apps:/apps"
-      - "/home/docker/appdaemon/conf:/conf"
-      - "/home/docker/appdaemon/logs:/logs"
-      - "/home/docker/home-assistant/config/secrets.yaml:/secrets.yaml"
-      - "/etc/localtime:/etc/localtime:ro"
+      - '/home/docker/appdaemon/compose/apps:/apps'
+      - '/home/docker/appdaemon/conf:/conf'
+      - '/home/docker/appdaemon/logs:/logs'
+      - '/home/docker/home-assistant/config/secrets.yaml:/secrets.yaml'
+      - '/etc/localtime:/etc/localtime:ro'
     environment:
       - TZ=${TZ:-UTC}
     ports:
@@ -86,10 +86,10 @@ services:
     hostname: ${HOSTNAME}
     domainname: ${DOMAIN_NAME}
     ports:
-      - "443:443/tcp"
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "80:80/tcp"
+      - '443:443/tcp'
+      - '53:53/tcp'
+      - '53:53/udp'
+      - '80:80/tcp'
 
     environment:
       - FTLCONF_LOCAL_IPV4=${FTLCONF_LOCAL_IPV4}
@@ -101,12 +101,12 @@ services:
       - REV_SERVER_DOMAIN=${REV_SERVER_DOMAIN}
       - REV_SERVER_CIDR=${REV_SERVER_CIDR}
       - PIHOLE_DNS_=127.0.0.1#5335
-      - DNSSEC="true"
+      - DNSSEC='true'
       - DNSMASQ_LISTENING=single
     # Volumes store your data between container upgrades
     volumes:
-      - "/home/docker/etc-pihole:/etc/pihole"
-      - "/home/docker/etc-dnsmasq.d:/etc/dnsmasq.d"
+      - '/home/docker/etc-pihole:/etc/pihole'
+      - '/home/docker/etc-dnsmasq.d:/etc/dnsmasq.d'
     #   https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
     restart: unless-stopped
     networks:
